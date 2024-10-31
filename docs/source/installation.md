@@ -1,23 +1,23 @@
 Installation
 ============
 
-**my-package** supports Python >= 3.8.
+**contexteval** supports Python >= 3.8.
 
 ## Installing with `pip`
 
-**my-package** is available [on PyPI](https://pypi.org/project/my-package/). Just run
+**contexteval** is available [on PyPI](https://pypi.org/project/contexteval/). Just run
 
 ```bash
-pip install my-package
+pip install contexteval
 ```
 
 ## Installing from source
 
-To install **my-package** from source, first clone [the repository](https://github.com/allenai/python-package-template):
+To install **contexteval** from source, first clone [the repository](https://github.com/allenai/contexteval):
 
 ```bash
-git clone https://github.com/allenai/python-package-template.git
-cd python-package-template
+git clone https://github.com/allenai/contexteval.git
+cd contexteval
 ```
 
 Then run
