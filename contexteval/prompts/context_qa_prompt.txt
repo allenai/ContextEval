@@ -1,0 +1,55 @@
+You will be shown a query issued by a real user to a language model. Imagine that you are required to answer this query. First, you need to answer whether it would be helpful to know context surrounding this query to give a useful response. The context can be about the user (eg, their background, age, language fluency, location, profession, expertise etc), their intent / preferences for the response (eg, query intent, text formatting/style, structure, length, presence of citations, or any other open-ended criteria) or information missing that is required to respond to a query or resolve ambiguity in the query. Queries that are objective, closed-ended or have straightforward answers should not require context.
+
+Answer in Yes or No for whether context is required and generate context if the answer is Yes. This context should be formatted as follow-up question answer pairs, where you ask the most important questions first and list plausible answers to these questions.
+
+Here are criteria that individual questions need to satisfy:
+* salient: The question should ask about information that would be useful to adapt the query's response to the user's needs and background.
+* influential: The answer to this question should directly influence the response. With different answers to this question, the response to the query would need to be phrased differently.
+
+Here are the criteria that the list of questions needs to satisfy:
+* sufficient: There should be enough important questions to cover a large space of possible contexts for the query.
+* ranked in order of salience: the questions should be ranked in the order of their importance.
+
+Here are the criteria that each answer set needs to satisfy:
+* plausible answers: The answer set should represent a realistic set of answers to the question, such that a real user would answer the question with any of the choices. **Do not generate answer choices such as "Other" which are uninformative.**
+* discrete answer space: The possible answers to the question should be discrete, short strings.
+* diverse coverage: The answer set should be a representative set of possible answers to the question, such that each answer choice would elicit different responses to the original query.
+
+Generate **up to** 10 follow-up QA pairs and they should all meet the above criteria. Each QA pair should be such that it is easy to check whether the QA is incorporated in a candidate response.
+
+###
+
+Query: best team in the football league
+
+Need for Context: Yes
+
+Context: Q: Which league are you referring to? A: ["English Premier League", "La Liga", "Bundesliga", "Italian Serie A", "MLS", "UEFA"]
+Q: How do you define "best"? A: ["Most recent wins", "Number of championships won", "Goal difference", "Squad strength"]
+Q: Do you want the best team based on current form or overall historical performance? A: ["Current form", "Historical performance"]
+Q: Are you asking about men’s football or women’s football? A: ["Men’s football", "Women’s football"]
+Q: Do you want statistics or more qualitative opinions in the response? A: ["Statistics", "Qualitative opinions", "Both"]
+Q: Do you have a specific time period in mind (e.g., this season, last five years)? A: ["This season", "Last five years", "Last decade"]
+Q: Would you like comparisons to other top teams outside the league? A: ["Yes", "No"]
+
+###
+
+Query: How do antibiotics work against bacteria?
+
+Need for Context: Yes
+
+Context: Q: What is your background in biology or medicine? A: ["No background", "High school level", "College level", "Medical or professional background"]
+Q: What is your purpose for asking this question? A: ["For a class", "Personal knowledge", "Professional/medical use", "To explain to someone else"]
+Q: What level of detail are you looking for in the explanation? A: ["Basic overview", "Intermediate (some scientific terms)", "Detailed (in-depth biological mechanisms)"]
+Q: Are you asking about a specific class of antibiotics? A: ["No, general explanation", "Beta-lactams (e.g., penicillin)", "Tetracyclines", "Macrolides", "Fluoroquinolones"]
+Q: Are you interested in how antibiotics target specific parts of bacterial cells? A: ["Yes, target mechanisms (e.g., cell wall, DNA replication)", "No, just a general overview"]
+Q: Do you want to know how antibiotics differ from other treatments, such as antivirals or antifungals? A: ["Yes, comparisons to other treatments", "No, just focus on antibiotics"]
+Q: Would you like the response to mention bacterial resistance to antibiotics? A: ["Yes", "No"]
+Q: Do you want to learn about the development of antibiotics and their discovery? A: ["Yes", "No"]
+Q: Do you want citations or references to sources in your response for further reading? A: ["Yes", "No"]
+Q: How long would you like the answer to be? A: ["5 sentences", "10 sentences", "20 sentences", ">20 sentences"]
+
+###
+
+Query: [QUERY]
+
+Need for Context:

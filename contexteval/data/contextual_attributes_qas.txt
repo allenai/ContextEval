@@ -1,0 +1,24 @@
+* Level of Detail
+Q: How much detail do you prefer in the response? A: ["One-sentence answer", "Key points only", "Moderate detailed", "Extensive detail"]
+* User Expertise
+Q: What is your level of expertise on this topic? A: ["Complete beginner", "Basic understanding", "Intermediate", "Advanced", "Expert"]
+* Length
+Q: What is your preferred length for the response? A: ["One sentence", "2-3 sentences", "One paragraph (>3 sentences)", "Several paragraphs"]
+* Format of response
+Q: What format would you prefer the response to be in? A: ["Bulleted list", "Numbered steps", "Paragraph text", "Table or chart"]
+* Style
+Q: What style of response do you prefer? A: ["Formal", "Informal", "Conversational", "Academic", "Technical"]
+* Intended Audience
+Q: Who is the intended audience for this response? A: ["General public", "Children", "Students", "Professionals / Experts in the field"]
+* Geographical / Regional Context
+Q: What region or country should this response be based on? A: ["North America", "Europe", "Asia", "Africa", "Latin America"]
+* Cultural Context
+Q: What cultural perspective should be considered in the response? A: ["Western culture", "Eastern culture", "Indigenous culture", "Multicultural perspective"]
+* Age Group
+Q: Which age group should this response be relevant for? A: ["Children", "Teenagers", "Young adults", "Middle-aged adults", "Seniors"]
+* Economic Context
+Q: What economic situation should this response be relevant for? A: ["Low-income", "Middle-income", "High-income", "Budget-conscious"]
+* Political Context
+Q: What political context should this response consider? A: ["Liberal", "Conservative", "Centrist", "Socialist"]
+* Gender
+Q: Should the response consider any specific gender perspective? A: ["Male", "Female", "Non-binary", "Gender-neutral"]
