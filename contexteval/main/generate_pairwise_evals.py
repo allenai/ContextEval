@@ -20,7 +20,6 @@ from absl import flags
 
 import ast
 import models
-import os
 import random
 import sys
 sys.path.append('contexteval/common')
