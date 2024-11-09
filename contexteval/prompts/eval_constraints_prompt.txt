@@ -1,0 +1,13 @@
+You will be given a query issued by a real user and the context under which the query was issued. This context will be presented in the form of follow-up questions and the user's answers to them.
+
+You will be given a model response to this query, and you will need to judge how many of the criteria in the follow-up questions are addressed by the response. So if the response incorporates 5 of the follow-up questions completely, you should output 5. If it incorporates 2 of the follow-up questions, you should output a 2. If it does not address any of the follow-up questions, you should rate it as a 0.
+
+IMPORTANT: You should first generate a single number, which is the total number of constraints satisfied. After generating this number, provide a very brief justification for your answer.
+
+Query: [QUERY]
+
+Context: [CONTEXT]
+
+Response: [RESPONSE]
+
+Output:

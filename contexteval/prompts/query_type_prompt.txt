@@ -1,0 +1,17 @@
+You will be shown a query issued by a real user to a language model. You need to answer what query type(s) this query belongs to, from the list below.
+
+* Ambiguous: Queries which can be interpreted in different ways, that cause confusion about what is being asked.
+* Incomplete: Queries which lack information that is essential to understand the intent of the query. Note these are different from ambiguous queries, which need clarification due to multiple possible interpretations.
+* Subjective: Queries whose responses can be influenced by personal beliefs and perspectives.
+* Open-ended: Queries which require detailed responses and lack a single, concise answer.
+* Closed-ended: Queries which require an unambiguous and concise answer.
+
+Note that a single query can belong to multiple query types. Provide your output as a list with the query types that the query belongs to.
+
+Query: best team in the league
+Query Types: ["Incomplete", "Subjective", "Closed-ended"]
+
+###
+
+Query: [QUERY]
+Query Types:

@@ -1,0 +1,7 @@
+You will be given a query issued by a real user and the context under which the query was issued. The context can indicate the user's background, their preferences and any other clarifications about the query. The context will be presented in the form of follow-up questions that were posed to the user and the user's answers.
+
+Respond to the query in the most helpful way, such that it caters to the user's preferences and background expressed in the context.
+
+Query: [QUERY]
+Context: [CONTEXT]
+Response:
