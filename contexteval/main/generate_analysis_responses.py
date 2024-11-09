@@ -44,9 +44,7 @@ def extract_dictionary(input_string):
     dict_str = input_string[dict_start:dict_end]
     dictionary = ast.literal_eval(dict_str)
     return dictionary
-  except Exception as e:
-    # print(input_string)
-    # print(f"Error occurred: {e}")
+  except Exception:
     return None
 
 

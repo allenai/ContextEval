@@ -16,7 +16,6 @@ import numpy as np
 import sys
 sys.path.append('contexteval/common')
 from scipy.stats import sem, t, ttest_ind, ttest_rel
-from statsmodels.stats import inter_rater as irr
 
 
 _EVAL_JUDGMENTS = flags.DEFINE_string(

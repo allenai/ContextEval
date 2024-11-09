@@ -50,13 +50,8 @@ def get_qa(input_str):
 
 def get_eval_judgement(cur_prompt, model):
   dict_out = None
-  count = 0
   while dict_out is None:
     eval_judgement = model.generate(cur_prompt)
-    # dict_out = extract_dictionary(eval_judgement)
-    # count += 1
-    # if count == 3:
-    #   break
     break
   return eval_judgement
   
