@@ -9,19 +9,19 @@ python3.10 main/generate_context_validation.py \
 --output_path=${OUTPUT_PATH}
 """
 
-from absl import app
-from absl import flags
-
 import ast
 import collections
 import models
 import random
 import re
 import sys
+from absl import app
+from absl import flags
+import tqdm
+
 sys.path.append('contexteval/common')
 import example_utils
 import tsv_utils
-import tqdm
 
 random.seed(42)
 

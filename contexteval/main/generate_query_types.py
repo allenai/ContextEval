@@ -11,15 +11,14 @@ python3.10 main/generate_query_types.py \
 
 from absl import app
 from absl import flags
-
 import models
 import random
 import sys
+import tqdm
 sys.path.append('contexteval/common')
 import example_utils
 import jsonl_utils
 import tsv_utils
-import tqdm
 
 
 random.seed(423)
