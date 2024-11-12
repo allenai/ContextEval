@@ -1,0 +1,4 @@
+You need to answer if the given query is well-formed. A well-formed query is one where there is an information need expressed in the query. However, a well-formed query *does not* need to be fluent, unambiguous, fully-specified or an objective query. Queries with racist, sexist or any harmful content are not well-formed. Queries that are not in English are also not well-formed. Answer in Yes or No.
+
+Query: [QUERY]
+Output:

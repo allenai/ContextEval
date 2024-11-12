@@ -1,0 +1,45 @@
+In this task, you are required to codify the justifications of annotators for their preference judgements over language model responses. You will be given a free-text justification where an annotator cites the reason for which they picked one of two responses. The annotator was given a query from a hypothetical user PersonX, two responses from language models, and optionally, context in the form of follow-up questions and Person X's answers to these questions. These questions can be about the user's intent, background and preferences.
+
+Given below are the set of codes which you will consider for coding the judgements. Each justification can be coded with multiple tags from these two categories.
+
+1. Content-Level Judgements:
+    * Relevance: The response directly addresses the query and follow-up questions (if provided).
+    * Correctness: The response is factually correct and accurate in terms of the information provided.
+    * Completeness: The response is sufficiently detailed or provides enough information to fully address the query (and follow-up questions, if provided).
+    * Detail: The response is more specific and detailed.
+    * Effective / Ineffective Context Adherence: Either a response effectively adheres to the provided context so it's useful for the user or the response does not effectively adhere to the the provided context or misinterprets the context. Note that these can refer to surface-level properties of responses.
+
+2. Surface-Level Judgements:
+    * Clarity and Readability: The response is easy to understand, clear, and well-articulated.
+    * Conciseness: The response is concise, providing the necessary information without unnecessary detail.
+    * Tone: The response uses an appropriate tone (e.g., polite, neutral, or professional) for the context or query.
+    * Style or Formatting: The response uses a better format, structure or style for presenting information.
+    * Length: The response is longer or shorter and hence more appropriate.
+
+
+EXAMPLES:
+
+Follow the structure of these examples and just generate the codes:
+
+Query: How do transformers work?
+Follow-Up Questions: Q: Do you want references to relevant papers? A: Yes
+Preference Given: Response 1
+Justification: "Response 1 is more relevant because it caters to the user preferences more effectively."
+Codes: 1
+
+Query: Why is the sky blue?
+Follow-Up Questions: Q: Would you like a basic or detailed explanation? A: Detailed
+Preference Given: Tie
+Justification: "I liked the bullets provided in the response and it flowed better."
+Codes: 2
+
+Query: What is photosynthesis?
+Follow-Up Questions: Q: How long do you want the response to be? A: <5 sentences
+Preference Given: Response 2
+Justification: "Response 2 was concise and to-the-point, as requested by the user."
+Codes: 1, 2
+
+Query: [QUERY]
+Preference Given: [PREFERENCE]
+Justification: [JUSTIFICATION]
+Codes:

@@ -1,0 +1,20 @@
+You will be given a query issued by a real user to a language model and the context under which the query may have been issued. This context will be presented in the form of a follow-up question issued to the user and possible answers to this question.
+
+You will be given a model response to this query, and you will need to judge the quality of this response corresponding to each follow-up question-answer pair. Rate the response on a scale of 1-5 on the following axis:
+
+* Relevance: How relevant is the response to addressing the query and context?
+    * 1: The response is not helpful in responding to the query and context at all.
+    * 2: The response provides limited help, missing important information from the query or context.
+    * 3: The response is somewhat helpful, offering useful information but lacking thoroughness or depth for the query and context.
+    * 4: The response is helpful, addressing most of the query and context adequately.
+    * 5: The response is highly helpful, fully addressing the query and context with thorough and useful information.
+
+IMPORTANT: You should produce the final output as a dictionary in precisely this format (with **): [OUTPUT_FORMAT], where you should fill in the spaces with ratings for each one of the possible answers to the follow-up question. Make note of the ** required to enlose the output dictionary.
+
+Query: [QUERY]
+
+Context: [CONTEXT]
+
+Response: [RESPONSE]
+
+Judgement:

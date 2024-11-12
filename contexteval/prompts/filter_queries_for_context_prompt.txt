@@ -1,0 +1,11 @@
+You will be given a query from a real user to a language model, along with a follow-up question that can be asked to the user. The follow-up question will have a set of answer choices. Your task is to answer the following three questions:
+
+1) Is it important to know the user's answer to the follow-up question to provide a useful response to the original query?
+2) Is the query independent of the answer choices? If the query already implies a specific answer choice, it is not independent.
+3) Is the query well-formed? A well-formed query clearly expresses an information need, even if it is not fully fluent, unambiguous, or fully specified. Queries not in English are not considered well-formed.
+
+IMPORTANT: Please provide the final output in the following dictionary format: {"1": "Yes/No", "2": "Yes/No", "3": "Yes/No"}.
+
+Query: [QUERY]
+Follow-up Question: [QUESTION]
+Output:
