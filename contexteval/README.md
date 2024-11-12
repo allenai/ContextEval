@@ -78,9 +78,9 @@ Example scripts for running context generation are at `bash_scripts/run_context_
 @inproceedings{malaviya2024contexteval,
    author = {Malaviya, Chaitanya and Chee Chang, Joseph and Roth, Dan and Iyyer, Mohit and Yatskar, Mark and Lo, Kyle},
    title = {Contextualized Evaluations: Taking the Guesswork Out of Language Model Evaluations},
-   journal = {arXiv},
+   journal = {arXiv preprint arXiv:2411.07237},
    month = {November},
    year = {2024},
-   url = "https://drive.google.com/file/d/1girNKIhwf63DO8KIPNs6v17hEcBaCOA4/view?usp=sharing"
+   url = "https://arxiv.org/abs/2411.07237"
 }
 ```
