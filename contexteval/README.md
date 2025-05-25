@@ -1,4 +1,4 @@
-## *Contextualized Evaluations*: Taking the Guesswork Out of Language Model Evaluations
+## *Contextualized Evaluations*: Judging Language Model Responses to Underspecified Queries
 
 
 ## Data Overview
@@ -77,9 +77,8 @@ Example scripts for running context generation are at `bash_scripts/run_context_
 ```
 @inproceedings{malaviya2024contexteval,
    author = {Malaviya, Chaitanya and Chee Chang, Joseph and Roth, Dan and Iyyer, Mohit and Yatskar, Mark and Lo, Kyle},
-   title = {Contextualized Evaluations: Taking the Guesswork Out of Language Model Evaluations},
-   journal = {arXiv preprint arXiv:2411.07237},
-   month = {November},
+   title = {Contextualized Evaluations: Judging Language Model Responses to Underspecified Queries},
+   journal = {Transactions of the Association for Computational Linguistics (TACL)},
    year = {2024},
    url = "https://arxiv.org/abs/2411.07237"
 }
