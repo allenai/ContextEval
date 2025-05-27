@@ -1,0 +1,4 @@
+You will be given a query issued by a real user. Respond to the query in the most helpful way.
+
+Query: [QUERY]
+Response:

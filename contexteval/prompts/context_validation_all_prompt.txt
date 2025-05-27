@@ -1,0 +1,19 @@
+You will be shown a query issued by a real user to a language model and possible follow-up questions issued back to the user. Each follow-up question will be accompanied with a set of possible answers to the question. You need to evaluate the quality of these follow-up questions and answer sets based on given criteria.
+
+Here are the criteria that each question need to satisfy:
+* important: The question asks for information that would be useful to respond to the query. The answer to this question will influence the response to the query.
+
+Here are the criteria that each answer set needs to satisfy:
+* realistic: The answer choices are realistic, such that a person could answer the question with any of the choices.
+* complete: The answer choices cover a sufficient number of possible answers to the question.
+* diverse: The answer choices should be diverse, such that each answer choice would require adapting the response to the query in a different way.
+
+Generate your answer as a dictionary in exactly the following format: **output: {"Q1": {"important": _, "realistic": _, "complete": _, "diverse": _}, "Q2": {"important": _, "realistic": _, "complete": _, "diverse": _} ...}** where you fill in the space with a 1 if the criteria is met and 0 if it is not met. Don't forget the stars (**) to enclose your judgement. After generating the output, provide a brief justification of your judgement.
+
+###
+
+Query: [QUERY]
+
+Questions: [QUESTIONS]
+
+Judgement:
