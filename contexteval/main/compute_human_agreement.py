@@ -7,17 +7,16 @@ python3.10 main/compute_agreement.py \
 --eval_outputs=${EVAL_OUTPUTS}
 """
 
-from absl import app
-from absl import flags
-
 import collections
 import json
-import numpy as np
 import sys
+
+import numpy as np
+from absl import app, flags
+
 sys.path.append('contexteval/common')
 from scipy.stats import sem, t, ttest_ind, ttest_rel
 from statsmodels.stats import inter_rater as irr
-
 
 _EVAL_JUDGMENTS = flags.DEFINE_string(
     "eval_judgments", "", "Path to the files containing the evaluation judgements of humans."

@@ -11,18 +11,18 @@ python3.10 main/generate_responses.py \
 --w_context=${W_CONTEXT}
 """
 
-from absl import app
-from absl import flags
-
 import random
 import re
 import sys
+
+from absl import app, flags
+
 sys.path.append('contexteval/common')
 import example_utils
 import jsonl_utils
-import tsv_utils
 import models
 import tqdm
+import tsv_utils
 
 random.seed(423)
 

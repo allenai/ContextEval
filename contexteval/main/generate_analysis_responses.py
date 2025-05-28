@@ -7,19 +7,19 @@ python3.10 main/generate_analysis_responses.py \
 --context_name="${CONTEXT_NAME}"
 """
 
-from absl import app
-from absl import flags
-
 import ast
 import os
 import random
 import re
 import sys
+
+from absl import app, flags
+
 sys.path.append('contexteval/common')
 import jsonl_utils
-import tsv_utils
 import models
 import tqdm
+import tsv_utils
 
 _CONTEXT_NAME = flags.DEFINE_string(
     "context_name", None, "Name of the contextual attribute."
@@ -44,9 +44,7 @@ def extract_dictionary(input_string):
     dict_str = input_string[dict_start:dict_end]
     dictionary = ast.literal_eval(dict_str)
     return dictionary
-  except Exception as e:
-    # print(input_string)
-    # print(f"Error occurred: {e}")
+  except Exception:
     return None
 
 

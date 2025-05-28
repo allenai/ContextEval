@@ -10,17 +10,25 @@ python3.10 main/generate_contexts.py \
 --model_name=gpt-4
 """
 
-from absl import app
-from absl import flags
-
-import models
 import random
 import sys
+
+import models
+from absl import app, flags
+
+sys.path.append('contexteval/common')
+import random
+import sys
+
+import example_utils
+import tqdm
+import tsv_utils
+from absl import app, flags
+
 sys.path.append('contexteval/common')
 import example_utils
+import models
 import tsv_utils
-import tqdm
-
 
 random.seed(42)
 

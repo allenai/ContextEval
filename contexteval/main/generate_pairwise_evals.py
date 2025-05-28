@@ -15,17 +15,28 @@ python3.10 main/generate_evals.py \
 --w_context=${W_CONTEXT}
 """
 
-from absl import app
-from absl import flags
-
 import ast
-import models
 import random
 import sys
+
+import models
+from absl import app, flags
+
 sys.path.append('contexteval/common')
+import ast
+import random
+import sys
+
 import jsonl_utils
-import tsv_utils
 import tqdm
+import tsv_utils
+from absl import app, flags
+
+sys.path.append('contexteval/common')
+
+import jsonl_utils
+import models
+import tsv_utils
 
 random.seed(23)
 

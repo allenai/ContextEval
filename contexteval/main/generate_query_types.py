@@ -9,20 +9,34 @@ python3.10 main/generate_query_types.py \
 --output_path=${OUTPUT_PATH}
 """
 
-from absl import app
-from absl import flags
-
-import models
 import random
 import sys
+
+import models
+from absl import app, flags
+
 sys.path.append('contexteval/common')
 import example_utils
 import jsonl_utils
-import tsv_utils
 import tqdm
-
+import tsv_utils
 
 random.seed(423)
+
+import random
+import sys
+
+import example_utils
+import jsonl_utils
+import models
+import tqdm
+import tsv_utils
+from absl import app, flags
+
+sys.path.append('contexteval/common')
+
+random.seed(423)
+
 
 _INPUT_PATH = flags.DEFINE_string(
     "input_path", "", "Path to the input file."

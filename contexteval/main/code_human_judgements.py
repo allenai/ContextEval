@@ -11,18 +11,17 @@ python3 main/code_judgements.py \
 --output_path=${OUTPUT_PATH}
 """
 
-from absl import app
-from absl import flags
-
 import json
-import models
 import random
 import sys
+
+import models
+from absl import app, flags
+
 sys.path.append('contexteval/common')
 import jsonl_utils
-import tsv_utils
 import tqdm
-
+import tsv_utils
 
 random.seed(423)
 
