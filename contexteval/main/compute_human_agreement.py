@@ -10,7 +10,7 @@ python3.10 main/compute_agreement.py \
 import collections
 import json
 import sys
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Set
 
 import numpy as np
 from absl import app, flags
@@ -143,7 +143,14 @@ def main(unused_argv) -> None:
         v_agree_float: List[float] = [float(x) for x in v_agree]
         print(k, len(v_agree_float))
         print(sum(v_agree_float) / len(v_agree_float) if v_agree_float else 0.0)
-        print(t.interval(confidence=0.95, df=len(v_agree_float) - 1, loc=np.mean(v_agree_float), scale=sem(v_agree_float)))
+        print(
+            t.interval(
+                confidence=0.95,
+                df=len(v_agree_float) - 1,
+                loc=np.mean(v_agree_float),
+                scale=sem(v_agree_float),
+            )
+        )
 
     print(
         ttest_rel(

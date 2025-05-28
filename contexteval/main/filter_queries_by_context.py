@@ -8,7 +8,7 @@ python3.10 main/filter_queries_by_context.py \
 """
 
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import models
 from absl import app, flags

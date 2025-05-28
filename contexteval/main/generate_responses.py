@@ -13,7 +13,7 @@ python3.10 main/generate_responses.py \
 
 import random
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from absl import app, flags
 

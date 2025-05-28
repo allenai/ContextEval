@@ -11,7 +11,7 @@ python3.10 main/generate_query_types.py \
 
 import random
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 import example_utils
 import jsonl_utils

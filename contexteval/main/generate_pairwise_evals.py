@@ -18,7 +18,7 @@ python3.10 main/generate_evals.py \
 import ast
 import random
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import tqdm
 from absl import app, flags
