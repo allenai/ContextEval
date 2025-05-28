@@ -11,69 +11,108 @@ python3.10 main/generate_responses.py \
 --w_context=${W_CONTEXT}
 """
 
-from absl import app
-from absl import flags
-
 import random
 import sys
-sys.path.append('contexteval/common')
+from typing import Any, Dict, List, Optional
+
+from absl import app, flags
+
+sys.path.append("contexteval/common")
 import example_utils
 import jsonl_utils
-import tsv_utils
 import models
 import tqdm
+import tsv_utils
 
+# Set random seed at module level
 random.seed(423)
 
-_INPUT_PATH = flags.DEFINE_string(
-    "input_path", "", "Path to the input file."
-)
-_OUTPUT_PATH = flags.DEFINE_string(
-    "output_path", "", "Path to the output file."
-)
-_MODEL_NAME = flags.DEFINE_string(
-    "model_name", "", "Model name."
-)
-_W_CONTEXT = flags.DEFINE_boolean(
-    "w_context", True, "Whether to provide queries with context."
-)
+_INPUT_PATH = flags.DEFINE_string("input_path", "", "Path to the input file.")
+_OUTPUT_PATH = flags.DEFINE_string("output_path", "", "Path to the output file.")
+_MODEL_NAME = flags.DEFINE_string("model_name", "", "Model name.")
+_W_CONTEXT = flags.DEFINE_boolean("w_context", True, "Whether to provide queries with context.")
+
+
+def get_model(model_name: str) -> Any:
+    """Initialize and return appropriate model.
+
+    Args:
+        model_name: Name of model to initialize
+
+    Returns:
+        Initialized model instance
+    """
+    if "gpt" in model_name:
+        return models.GPT4(model_name=model_name)
+    elif "gemini" in model_name:
+        return models.Gemini(model_name=model_name)
+    elif "claude" in model_name:
+        return models.Claude(model_name=model_name)
+    elif "jamba" in model_name:
+        return models.Jamba(model_name=model_name)
+    else:
+        return models.TogetherAI(model_name=model_name)
+
+
+def prepare_prompt(prompt_template: str, query: str, context: Optional[str] = None) -> str:
+    """Prepare prompt by replacing placeholders.
+
+    Args:
+        prompt_template: Template string with placeholders
+        query: Query to insert
+        context: Optional context to insert
+
+    Returns:
+        Prepared prompt string
+    """
+    prompt = (prompt_template + ".")[:-1]
+    prompt = prompt.replace("[QUERY]", query)
+    if context is not None:
+        prompt = prompt.replace("[CONTEXT]", context)
+    return prompt
 
 
 def main(unused_argv) -> None:
-  if _W_CONTEXT.value:
-    response_prompt = "\n".join(tsv_utils.read_txt("prompts/response_w_context_prompt.txt"))
-  else:
-    response_prompt = "\n".join(tsv_utils.read_txt("prompts/response_wo_context_prompt.txt"))
-
-  examples = example_utils.read_examples(_INPUT_PATH.value)
-
-  if "gpt" in _MODEL_NAME.value:
-    model = models.GPT4(model_name=_MODEL_NAME.value)
-  elif "gemini" in _MODEL_NAME.value:
-    model = models.Gemini(model_name=_MODEL_NAME.value)
-  elif "claude" in _MODEL_NAME.value:
-    model = models.Claude(model_name=_MODEL_NAME.value)
-  elif "jamba" in _MODEL_NAME.value:
-    model = models.Jamba(model_name=_MODEL_NAME.value)
-  else:
-    model = models.TogetherAI(model_name=_MODEL_NAME.value)
-
-  outputs = []
-  idx = 0
-  for ex in tqdm.tqdm(examples):
-    cur_prompt = (response_prompt + ".")[:-1]
-    cur_prompt = cur_prompt.replace("[QUERY]", ex.query)
+    # Load appropriate prompt
     if _W_CONTEXT.value:
-      cur_prompt = cur_prompt.replace("[CONTEXT]", ex.sampled_context)
-      context_response = model.generate(input_text=cur_prompt, max_len=2048)
-      outputs.append({"query": ex.query, "context": ex.sampled_context, "response": context_response, "all_contexts": ex.contexts})
+        response_prompt = "\n".join(tsv_utils.read_txt("prompts/response_w_context_prompt.txt"))
     else:
-      response = model.generate(input_text=cur_prompt, max_len=2048)
-      outputs.append({"query": ex.query, "response": response})
-    idx += 1
+        response_prompt = "\n".join(tsv_utils.read_txt("prompts/response_wo_context_prompt.txt"))
 
-    jsonl_utils.write(_OUTPUT_PATH.value, [outputs[-1]], append=True)
+    # Load examples
+    examples = example_utils.read_examples(_INPUT_PATH.value)
+
+    # Initialize model
+    model = get_model(_MODEL_NAME.value)
+
+    outputs = []
+    for ex in tqdm.tqdm(examples):
+        try:
+            # Prepare prompt
+            cur_prompt = prepare_prompt(
+                response_prompt, ex.query, ex.sampled_context if _W_CONTEXT.value else None
+            )
+
+            # Generate response
+            response = model.generate(input_text=cur_prompt, max_len=2048)
+
+            # Prepare output
+            output = {"query": ex.query, "response": response}
+            if _W_CONTEXT.value:
+                output.update(
+                    {
+                        "context": ex.sampled_context,
+                        "all_contexts": ex.contexts,
+                    }
+                )
+
+            outputs.append(output)
+            jsonl_utils.write(_OUTPUT_PATH.value, [output], append=True)
+
+        except Exception as e:
+            print(f"Error processing example: {e}")
+            continue
 
 
 if __name__ == "__main__":
-  app.run(main)
+    app.run(main)

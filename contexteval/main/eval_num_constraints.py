@@ -9,45 +9,41 @@ python3.10 main/eval_constraints.py \
 --output_path=${OUTPUT_PATH}
 """
 
-from absl import app
-from absl import flags
+import sys
 
 import models
-import sys
-sys.path.append('contexteval/common')
+from absl import app, flags
+
+sys.path.append("contexteval/common")
 import jsonl_utils
-import tsv_utils
 import tqdm
+import tsv_utils
 
+_INPUT_PATH = flags.DEFINE_string("input_path", "", "Path to the input file.")
+_OUTPUT_PATH = flags.DEFINE_string("output_path", "", "Path to the output file.")
 
-_INPUT_PATH = flags.DEFINE_string(
-    "input_path", "", "Path to the input file."
-)
-_OUTPUT_PATH = flags.DEFINE_string(
-    "output_path", "", "Path to the output file."
-)
 
 def main(unused_argv) -> None:
-  prompt = "\n".join(tsv_utils.read_txt("prompts/eval_constraints_prompt.txt"))
-  examples = jsonl_utils.read(_INPUT_PATH.value)
-  model = models.GPT4()
-  for ex in tqdm.tqdm(examples):
-    cur_prompt = (prompt + ".")[:-1]
-    cur_prompt = cur_prompt.replace("[QUERY]", ex["query"])
-    cur_prompt = cur_prompt.replace("[CONTEXT]", ex["context"])
-    cur_prompt = cur_prompt.replace("[RESPONSE]", ex["candidate_one_response"])
-    num_constraints_output_one = model.generate(cur_prompt)
+    prompt = "\n".join(tsv_utils.read_txt("prompts/eval_constraints_prompt.txt"))
+    examples = jsonl_utils.read(_INPUT_PATH.value)
+    model = models.GPT4()
+    for ex in tqdm.tqdm(examples):
+        cur_prompt = (prompt + ".")[:-1]
+        cur_prompt = cur_prompt.replace("[QUERY]", ex["query"])
+        cur_prompt = cur_prompt.replace("[CONTEXT]", ex["context"])
+        cur_prompt = cur_prompt.replace("[RESPONSE]", ex["candidate_one_response"])
+        num_constraints_output_one = model.generate(cur_prompt)
 
-    cur_prompt = (prompt + ".")[:-1]
-    cur_prompt = cur_prompt.replace("[QUERY]", ex["query"])
-    cur_prompt = cur_prompt.replace("[CONTEXT]", ex["context"])
-    cur_prompt = cur_prompt.replace("[RESPONSE]", ex["candidate_two_response"])
-    num_constraints_output_two = model.generate(cur_prompt)
-    ex["candidate_one_constraints"] = num_constraints_output_one
-    ex["candidate_two_constraints"] = num_constraints_output_two
+        cur_prompt = (prompt + ".")[:-1]
+        cur_prompt = cur_prompt.replace("[QUERY]", ex["query"])
+        cur_prompt = cur_prompt.replace("[CONTEXT]", ex["context"])
+        cur_prompt = cur_prompt.replace("[RESPONSE]", ex["candidate_two_response"])
+        num_constraints_output_two = model.generate(cur_prompt)
+        ex["candidate_one_constraints"] = num_constraints_output_one
+        ex["candidate_two_constraints"] = num_constraints_output_two
 
-  jsonl_utils.write(_OUTPUT_PATH.value, examples)
+    jsonl_utils.write(_OUTPUT_PATH.value, examples)
 
 
 if __name__ == "__main__":
-  app.run(main)
+    app.run(main)
