@@ -64,8 +64,9 @@ jobs:
             mypy-${{ env.CACHE_PREFIX }}-${{ runner.os }}-${{ matrix.python }}-${{ hashFiles('*requirements.txt') }}
 
       - name: ${{ matrix.task.name }}
+        shell: bash
         run: |
-          . .venv/bin/activate
+          source .venv/bin/activate
           ${{ matrix.task.run }}
 
       - name: Clean up
