@@ -11,170 +11,225 @@ python3.10 main/generate_context_validation.py \
 
 import ast
 import collections
-import models
 import random
 import re
 import sys
-from absl import app
-from absl import flags
-import tqdm
+from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.append('contexteval/common')
+import models
+import tqdm
+from absl import app, flags
+
+sys.path.append("contexteval/common")
 import example_utils
 import tsv_utils
 
 random.seed(42)
 
 
-_INPUT_PATH = flags.DEFINE_string(
-    "input_path", "", "Path to the input file."
-)
-_OUTPUT_PATH = flags.DEFINE_string(
-    "output_path", "", "Path to the output file."
-)
+_INPUT_PATH = flags.DEFINE_string("input_path", "", "Path to the input file.")
+_OUTPUT_PATH = flags.DEFINE_string("output_path", "", "Path to the output file.")
 
-MODEL_ONE="gpt-4"
-MODEL_TWO="gemini-1.5-pro"
-MODEL_THREE="claude-3.5-sonnet"
+MODEL_ONE = "gpt-4"
+MODEL_TWO = "gemini-1.5-pro"
+MODEL_THREE = "claude-3.5-sonnet"
 
 
-def extract_dictionary(input_string):
-  try:
-    input_string = input_string.replace("*", "").strip()
-    search_str = "output: "
-    end_str = "}"
-    dict_start = input_string.find(search_str) + len(search_str)
-    dict_end = input_string.find(end_str) + 1
-    dict_str = input_string[dict_start:dict_end]
-    dictionary = ast.literal_eval(dict_str)
-    return dictionary
-  except Exception:
-    return None
+def extract_dictionary(input_string: str) -> Optional[Dict[str, Any]]:
+    try:
+        input_string = input_string.replace("*", "").strip()
+        search_str = "output: "
+        end_str = "}"
+        dict_start = input_string.find(search_str) + len(search_str)
+        dict_end = input_string.find(end_str) + 1
+        dict_str = input_string[dict_start:dict_end]
+        dictionary = ast.literal_eval(dict_str)
+        return dictionary
+    except Exception:
+        return None
 
 
-def check_output_format(input_string):
-  try:
-    input_string = input_string.replace("*", "").strip()
-    search_str = "output: "
-    end_str = "}}"
-    dict_start = input_string.find(search_str) + len(search_str)
-    dict_end = input_string.find(end_str) + 2
-    dict_str = input_string[dict_start:dict_end]
-    input_string = ast.literal_eval(dict_str)
-    if not isinstance(input_string, dict):
-      return False
-    
-    # Define the required keys for each question
-    required_keys = {"important", "realistic", "complete", "diverse"}
-    
-    for key, value in input_string.items():
-      # Check if each key follows the "Qx" format
-      if not key.startswith("Q") or not key[1:].isdigit():
+def check_output_format(input_string: str) -> bool:
+    try:
+        input_string = input_string.replace("*", "").strip()
+        search_str = "output: "
+        end_str = "}}"
+        dict_start = input_string.find(search_str) + len(search_str)
+        dict_end = input_string.find(end_str) + 2
+        dict_str = input_string[dict_start:dict_end]
+        input_string = ast.literal_eval(dict_str)
+        if not isinstance(input_string, dict):
+            return False
+
+        # Define the required keys for each question
+        required_keys = {"important", "realistic", "complete", "diverse"}
+
+        for key, value in input_string.items():
+            # Check if each key follows the "Qx" format
+            if not key.startswith("Q") or not key[1:].isdigit():
+                return False
+
+            # Check if the value is a dictionary
+            if not isinstance(value, dict):
+                return False
+
+            # Check if the dictionary contains the required keys
+            if set(value.keys()) != required_keys:
+                return False
+
+            # Check if the values for each required key are integers and equal to 1
+            for k, v in value.items():
+                if not isinstance(v, int) or (v != 0 and v != 1):
+                    return False
+        return True
+
+    except Exception as e:
+        print(input_string)
+        print(f"Error occurred: {e}")
         return False
-        
-      # Check if the value is a dictionary
-      if not isinstance(value, dict):
-        return False
-        
-      # Check if the dictionary contains the required keys
-      if set(value.keys()) != required_keys:
-        return False
-        
-      # Check if the values for each required key are integers and equal to 1
-      for k, v in value.items():
-        if not isinstance(v, int) or (v != 0 and v != 1):
-          return False
-    return True
 
-  except Exception as e:
-    print(input_string)
-    print(f"Error occurred: {e}")
-    return False
-  
-def get_validation_labels(prompt, model):
-  trials = 0
-  while True:
-    out_labels = model.generate(prompt)
-    is_valid_output = check_output_format(out_labels)
-    trials += 1
-    if is_valid_output or trials == 3:
-      break
-  return extract_dictionary(out_labels)
+
+def get_validation_labels(prompt: str, model: Any) -> Optional[Dict[str, Any]]:
+    trials = 0
+    while True:
+        out_labels = model.generate(prompt)
+        is_valid_output = check_output_format(out_labels)
+        trials += 1
+        if is_valid_output or trials == 3:
+            break
+    return extract_dictionary(out_labels)
 
 
 def main(unused_argv) -> None:
-  context_prompt = "\n".join(tsv_utils.read_txt("prompts/context_validation_all_prompt.txt"))
-  examples = {}
-  examples[MODEL_ONE] = example_utils.read_examples(_INPUT_PATH.value)
-  examples[MODEL_TWO] = example_utils.read_examples(_INPUT_PATH.value.replace(MODEL_ONE, MODEL_TWO))
-  examples[MODEL_THREE] = example_utils.read_examples(_INPUT_PATH.value.replace(MODEL_ONE, MODEL_THREE))
-  underspec_queries = {}
-  underspec_queries[MODEL_ONE] = [ex.query for ex in examples[MODEL_ONE] if ex.contexts != "No" and "Need for Context: No" not in ex.contexts]
-  underspec_queries[MODEL_TWO] = [ex.query for ex in examples[MODEL_TWO] if ex.contexts != "No" and "Need for Context: No" not in ex.contexts]
-  underspec_queries[MODEL_THREE] = [ex.query for ex in examples[MODEL_THREE] if ex.contexts != "No" and "Need for Context: No" not in ex.contexts]
-  all_underspec_queries = set(underspec_queries[MODEL_ONE] + underspec_queries[MODEL_TWO] + underspec_queries[MODEL_THREE])
+    context_prompt = "\n".join(tsv_utils.read_txt("prompts/context_validation_all_prompt.txt"))
+    examples: Dict[str, List[example_utils.Example]] = {}
+    examples[MODEL_ONE] = example_utils.read_examples(_INPUT_PATH.value)
+    examples[MODEL_TWO] = example_utils.read_examples(
+        _INPUT_PATH.value.replace(MODEL_ONE, MODEL_TWO)
+    )
+    examples[MODEL_THREE] = example_utils.read_examples(
+        _INPUT_PATH.value.replace(MODEL_ONE, MODEL_THREE)
+    )
 
-  indices = list(range(0, len(examples[MODEL_ONE])))
-  eval_models = {}
-  eval_models[MODEL_ONE] = models.GPT4()
-  eval_models[MODEL_TWO] = models.Gemini()
-  eval_models[MODEL_THREE] = models.Claude(model_name=MODEL_THREE)
-  model_idxs = random.choices([1, 2, 3], k=len(indices))
+    underspec_queries: Dict[str, List[str]] = {}
+    underspec_queries[MODEL_ONE] = [
+        ex.query
+        for ex in examples[MODEL_ONE]
+        if ex.contexts != "No" and "Need for Context: No" not in ex.contexts
+    ]
+    underspec_queries[MODEL_TWO] = [
+        ex.query
+        for ex in examples[MODEL_TWO]
+        if ex.contexts != "No" and "Need for Context: No" not in ex.contexts
+    ]
+    underspec_queries[MODEL_THREE] = [
+        ex.query
+        for ex in examples[MODEL_THREE]
+        if ex.contexts != "No" and "Need for Context: No" not in ex.contexts
+    ]
+    all_underspec_queries = set(
+        underspec_queries[MODEL_ONE] + underspec_queries[MODEL_TWO] + underspec_queries[MODEL_THREE]
+    )
 
-  for idx in tqdm.tqdm(indices):
-    # Skip examples that are not underspecified
-    if examples[MODEL_ONE][idx].query not in all_underspec_queries:
-      continue
-    model_idx = model_idxs[indices.index(idx)]
-    skip = True
-    tries = 0
-    ex = None
-    # Pick context generated by one of the three models
-    while skip:
-      if model_idx == 1:
-        ex = examples[MODEL_ONE][idx]
-      elif model_idx == 2:
-        ex = examples[MODEL_TWO][idx]
-      elif model_idx == 3:
-        ex = examples[MODEL_THREE][idx]
+    indices = list(range(0, len(examples[MODEL_ONE])))
+    eval_models: Dict[str, Any] = {}
+    eval_models[MODEL_ONE] = models.GPT4()
+    eval_models[MODEL_TWO] = models.Gemini()
+    eval_models[MODEL_THREE] = models.Claude(model_name=MODEL_THREE)
+    model_idxs = random.choices([1, 2, 3], k=len(indices))
 
-      questions = [q.strip() for q in re.findall(r'Q:.*?\?', ex.contexts)]
-      answers = [a.strip() for a in re.findall(r'A:.*?\]', ex.contexts)]
+    for idx in tqdm.tqdm(indices):
+        # Skip examples that are not underspecified
+        if examples[MODEL_ONE][idx].query not in all_underspec_queries:
+            continue
+        model_idx = model_idxs[indices.index(idx)]
+        skip = True
+        tries = 0
+        ex: Optional[example_utils.Example] = None
+        # Pick context generated by one of the three models
+        while skip:
+            if model_idx == 1:
+                ex = examples[MODEL_ONE][idx]
+            elif model_idx == 2:
+                ex = examples[MODEL_TWO][idx]
+            elif model_idx == 3:
+                ex = examples[MODEL_THREE][idx]
 
-      if len(questions) != len(answers):
-        model_idx = random.choice([1, 2, 3])
-      else:
-        skip = False
-        break
-      if tries == 10:
-        break
-      tries += 1
-    
-    if skip:
-      continue
+            if ex is None or ex.contexts is None:
+                model_idx = random.choice([1, 2, 3])
+                continue
 
-    cur_prompt = (context_prompt + ".")[:-1]
-    cur_prompt = cur_prompt.replace("[QUERY]", ex.query)
-    cur_prompt = cur_prompt.replace("[QUESTIONS]", "\n".join([f"Q{i+1}: {q}\nA{i+1}: {a}" for i, (q, a) in enumerate(zip(questions, answers))]))
-    
-    val_labels = {}
-    val_labels[MODEL_ONE] = get_validation_labels(cur_prompt, eval_models[MODEL_ONE])
-    val_labels[MODEL_TWO] = get_validation_labels(cur_prompt, eval_models[MODEL_TWO])
-    val_labels[MODEL_THREE] = get_validation_labels(cur_prompt, eval_models[MODEL_THREE])
-    selected_qas = []
-    for q_idx in range(1, len(questions)+1):
-      validation_labels = [val_labels[MODEL_ONE][f"Q{q_idx}"], val_labels[MODEL_TWO][f"Q{q_idx}"], val_labels[MODEL_THREE][f"Q{q_idx}"]]
-      counter = collections.Counter([labels["important"] for labels in validation_labels if labels is not None and "important" in labels])
-      majority_label, _ = counter.most_common(1)[0]
-      if majority_label == 0:
-        continue
-      selected_qas.append((questions[q_idx], answers[q_idx]))
-  
-    ex.contexts = "\n".join([f"Q{i+1}: {q}\nA{i+1}: {a}" for i, (q, a) in enumerate(selected_qas)])
-    ex.context_model_source = model_idx # model source (1: GPT-4, 2: Gemini, 3: Claude)
+            questions = [q.strip() for q in re.findall(r"Q:.*?\?", ex.contexts)]
+            answers = [a.strip() for a in re.findall(r"A:.*?\]", ex.contexts)]
 
-    example_utils.write_examples(_OUTPUT_PATH.value, [ex], append=True)
+            if len(questions) != len(answers):
+                model_idx = random.choice([1, 2, 3])
+            else:
+                skip = False
+                break
+            if tries == 10:
+                break
+            tries += 1
+
+        if skip or ex is None:
+            continue
+
+        cur_prompt = (context_prompt + ".")[:-1]
+        cur_prompt = cur_prompt.replace("[QUERY]", ex.query)
+        cur_prompt = cur_prompt.replace(
+            "[QUESTIONS]",
+            "\n".join(
+                [f"Q{i+1}: {q}\nA{i+1}: {a}" for i, (q, a) in enumerate(zip(questions, answers))]
+            ),
+        )
+
+        val_labels: Dict[str, Optional[Dict[str, Any]]] = {}
+        val_labels[MODEL_ONE] = get_validation_labels(cur_prompt, eval_models[MODEL_ONE])
+        val_labels[MODEL_TWO] = get_validation_labels(cur_prompt, eval_models[MODEL_TWO])
+        val_labels[MODEL_THREE] = get_validation_labels(cur_prompt, eval_models[MODEL_THREE])
+        selected_qas: List[Tuple[str, str]] = []
+        for q_idx in range(1, len(questions) + 1):
+            label_one = val_labels[MODEL_ONE]
+            label_two = val_labels[MODEL_TWO]
+            label_three = val_labels[MODEL_THREE]
+            qkey = f"Q{q_idx}"
+            v1 = (
+                label_one[qkey]
+                if label_one is not None and isinstance(label_one, dict) and qkey in label_one
+                else None
+            )
+            v2 = (
+                label_two[qkey]
+                if label_two is not None and isinstance(label_two, dict) and qkey in label_two
+                else None
+            )
+            v3 = (
+                label_three[qkey]
+                if label_three is not None and isinstance(label_three, dict) and qkey in label_three
+                else None
+            )
+            validation_labels = [v1, v2, v3]
+            counter = collections.Counter(
+                [
+                    labels["important"]
+                    for labels in validation_labels
+                    if labels is not None and isinstance(labels, dict) and "important" in labels
+                ]
+            )
+            if not counter:
+                continue
+            majority_label, _ = counter.most_common(1)[0]
+            if majority_label == 0:
+                continue
+            selected_qas.append((questions[q_idx - 1], answers[q_idx - 1]))
+
+        ex.contexts = "\n".join(
+            [f"Q{i+1}: {q}\nA{i+1}: {a}" for i, (q, a) in enumerate(selected_qas)]
+        )
+        ex.context_model_source = model_idx  # model source (1: GPT-4, 2: Gemini, 3: Claude)
+
+        example_utils.write_examples(_OUTPUT_PATH.value, [ex], append=True)
 
 
 if __name__ == "__main__":
-  app.run(main)
+    app.run(main)

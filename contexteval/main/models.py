@@ -1,14 +1,15 @@
-import anthropic
-import openai
-from openai import OpenAI
+import logging
 import os
-import tenacity
 import time
-from together import Together
+
+import anthropic
 import google.generativeai as genai
+import openai
+import tenacity
 from ai21 import AI21Client
 from ai21.models.chat import ChatMessage
-import logging
+from openai import OpenAI
+from together import Together
 
 openai._utils._logs.logger.setLevel(logging.WARNING)
 openai._utils._logs.httpx_logger.setLevel(logging.WARNING)
@@ -19,8 +20,9 @@ class GPT4:
         self.model_name = model_name
         if model_name == "gpt-4":
             self.model_name = "gpt-4o"
-        self.client = OpenAI(organization=os.getenv("OPENAI_ORGANIZATION"),
-                api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = OpenAI(
+            organization=os.getenv("OPENAI_ORGANIZATION"), api_key=os.getenv("OPENAI_API_KEY")
+        )
 
     @tenacity.retry(
         wait=tenacity.wait_random_exponential(min=1, max=60),
@@ -33,12 +35,11 @@ class GPT4:
             print(f"An error occurred: {e}")
             raise
 
-
     def generate(self, input_text, max_len=512):  # gpt-4o-2024-05-13
         resp = self.chat_completion_with_backoff(
             model=self.model_name,
             messages=[{"role": "user", "content": input_text}],
-            max_tokens=max_len
+            max_tokens=max_len,
         )
         output = resp.choices[0].message.content
         return output
@@ -54,18 +55,23 @@ class Gemini:
         orig_t = 5
         while True:
             try:
-                response = self.model.generate_content(input_text,
-                                                  generation_config={"max_output_tokens": max_len},
-                                                  safety_settings=[
-                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                ])
+                response = self.model.generate_content(
+                    input_text,
+                    generation_config={"max_output_tokens": max_len},
+                    safety_settings=[
+                        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                    ],
+                )
                 return response.text
             except Exception as e:
                 print(e)
-                if "Invalid operation: The `response.text` quick accessor requires the response to contain a valid `Part`" in e.args[0]:
+                if (
+                    "Invalid operation: The `response.text` quick accessor requires the response to contain a valid `Part`"
+                    in e.args[0]
+                ):
                     return "No response. Finish Reason: Invalid operation."
                 if "Invalid operation:" in e.args[0]:
                     return "No response. Finish Reason: Invalid operation."
@@ -115,7 +121,7 @@ class TogetherAI:
                 response = self.client.chat.completions.create(
                     model=self.model_name,
                     messages=[{"role": "user", "content": input_text}],
-                    max_tokens=max_len
+                    max_tokens=max_len,
                 )
             except Exception as e:
                 print("Exception:", e)

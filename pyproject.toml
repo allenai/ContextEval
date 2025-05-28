@@ -27,7 +27,8 @@ dependencies = [
   "together",
   "datasets",
   "tqdm",
-  "scipy"
+  "scipy",
+  "absl-py"
 ]
 license = {file = "LICENSE"}
 
